@@ -7,8 +7,9 @@ et d'analyse de données énergétiques publiques.
 
 ## Premier cas métier
 
-Étudier l'évolution de la part des énergies renouvelables
-dans la production d'électricité en France et en Allemagne.
+Comment a évolué la part des renouvelables
+dans la production d'électricité en France
+et en Allemagne entre 2000 et 2025 ?
 
 ## Source
 
@@ -43,15 +44,23 @@ depuis l'URL de la version 2026-09-10 indiquée ci-dessus.
 
 python src/energy_pipeline.py
 
-## Résultat
+## Résultats de l'analyse
 
-data/processed/renewables_fr_de.csv
+### Visualisation
 
-## Prochaines étapes
+![Évolution des renouvelables en France et Allemagne](reports/figures/evolution_renouvelables.png)
 
-- Tests automatisés
-- Analyse SQL
-- Data Warehouse
-- dbt
-- Airflow
-- Visualisation
+### Données et indicateurs
+
+- [Données transformées](data/processed/renewables_fr_de.csv)
+- [Tableau des KPI](reports/kpi_summary.csv)
+
+### Méthodologie
+
+1. Extraction des données énergétiques OWID.
+2. Sélection de la France et de l'Allemagne.
+3. Filtrage de la période 2000-2025.
+4. Traitement des valeurs manquantes.
+5. Vérification des doublons et pourcentages.
+6. Calcul de l'évolution en points de pourcentage.
+7. Export CSV et visualisation.

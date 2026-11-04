@@ -1,17 +1,13 @@
-# Environnement Python
+# Python
 .venv/
 __pycache__/
 *.pyc
 .pytest_cache/
 
-# Fichiers locaux
+# Fichiers locaux et secrets
 .DS_Store
 .env
 
-# Données téléchargées et générées
+# Conserver les données brutes uniquement en local
 data/raw/*
-data/processed/*
-
-# Garder les dossiers dans Git
 !data/raw/.gitkeep
-!data/processed/.gitkeep
