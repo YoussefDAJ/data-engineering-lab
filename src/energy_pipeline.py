@@ -1,38 +1,50 @@
 from pathlib import Path
 import pandas as pd
 
-# Chemins du projet
+# 1. Définir les chemins
 BASE = Path(__file__).resolve().parent.parent
 
 SOURCE = BASE / "data/raw/owid_energy.csv"
 SORTIE = BASE / "data/processed/renewables_fr_de.csv"
 
-# Charger les colonnes utiles
+# 2. Charger les données
 colonnes = ["country", "year", "renewables_electricity_share_pct"]
 
 df = pd.read_csv(SOURCE, usecols=colonnes)
 
-# Filtrer les pays et les années
-resultat = df.loc[
-    df["country"].isin(["France", "Germany"]) & (df["year"] >= 2000)
+# 3. Filtrer les observations
+df = df.loc[
+    df["country"].isin(["France", "Germany"]) & df["year"].between(2000, 2025)
 ].copy()
 
-# Supprimer les valeurs manquantes de l'indicateur
-resultat = resultat.dropna(subset=["renewables_electricity_share_pct"])
+# 4. Contrôler les données manquantes
+print("Valeurs manquantes :")
+print(df.isna().sum())
 
-# Trier les observations
-resultat = resultat.sort_values(["country", "year"])
+df = df.dropna(subset=["renewables_electricity_share_pct"])
 
-# Contrôles de qualité
-if resultat.duplicated(["country", "year"]).any():
-    raise ValueError("Doublons pays-année détectés")
+# 5. Vérifier la qualité des données
+if df.duplicated(["country", "year"]).any():
+    raise ValueError("Doublons pays/année")
 
-if not resultat["renewables_electricity_share_pct"].between(0, 100).all():
-    raise ValueError("Pourcentage hors limites")
+if not df["renewables_electricity_share_pct"].between(0, 100).all():
+    raise ValueError("Pourcentage invalide")
 
-# Exporter les données transformées
+if set(df["country"]) != {"France", "Germany"}:
+    raise ValueError("Un pays est absent des résultats")
+
+# 6. Trier les observations
+df = df.sort_values(["country", "year"])
+
+# 7. Exporter les données propres
 SORTIE.parent.mkdir(parents=True, exist_ok=True)
-resultat.to_csv(SORTIE, index=False)
+df.to_csv(SORTIE, index=False)
 
-print(resultat.tail(10))
-print("Export terminé :", SORTIE)
+# 8. Afficher les résultats
+print("\nDimensions :", df.shape)
+print("\nDernières observations par pays :")
+
+dernieres = df.sort_values("year").groupby("country").tail(1)
+
+print(dernieres.to_string(index=False))
+print("\nFichier créé :", SORTIE)

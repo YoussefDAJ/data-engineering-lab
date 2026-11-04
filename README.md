@@ -1,68 +1,57 @@
+# Energy Data Engineering Lab
 
-# Analyse des ventes avec Python
+## Objectif
 
-## 1. Présentation du projet
+Construire progressivement une plateforme de traitement
+et d'analyse de données énergétiques publiques.
 
-Ce projet permet d'analyser les performances
-commerciales d'une entreprise à partir d'un
-fichier CSV.
+## Premier cas métier
 
-## 2. Objectif métier
+Étudier l'évolution de la part des énergies renouvelables
+dans la production d'électricité en France et en Allemagne.
 
-Calculer le chiffre d'affaires par région
-pour identifier les régions les plus performantes.
+## Source
 
-## 3. Technologies utilisées
+Our World in Data - Energy Dataset
+Version : 2026-09-10
+
+https://catalog.ourworldindata.org/energy/owid_energy/
+
+Les données sont compilées à partir de plusieurs producteurs,
+notamment Ember et Energy Institute. Consulter les conditions
+de réutilisation et les références sur le site source.
+
+## Technologies
 
 - Python
 - pandas
-- pytest (pour les futurs tests)
-- Git
+- Git et GitHub
+- pytest (prochain module)
 
-## 4. Structure du projet
+## Installation
 
-- data/ : fichiers de données
-- src/ : scripts Python
-- tests/ : tests automatisés
-- notebooks/ : analyses exploratoires
-- requirements.txt : dépendances Python
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
 
-## 5. Installation
+## Données
 
-Créer un environnement virtuel :
+Télécharger le CSV officiel dans data/raw/owid_energy.csv
+depuis l'URL de la version 2026-09-10 indiquée ci-dessus.
 
-    python3 -m venv .venv
+## Exécution
 
-Activer l'environnement :
+python src/energy_pipeline.py
 
-    source .venv/bin/activate
+## Résultat
 
-Installer les bibliothèques :
+data/processed/renewables_fr_de.csv
 
-    python -m pip install -r requirements.txt
+## Prochaines étapes
 
-## 6. Exécution
-
-Depuis la racine du projet :
-
-    python src/kpi.py
-
-## 7. Résultats attendus
-
-Chiffre d'affaires par région :
-
-- Nord : 390 €
-- Sud : 500 €
-- Total : 890 €
-
-## 8. Source des données
-
-Jeu de données fictif créé pour
-l'apprentissage de Python et pandas.
-
-## 9. Améliorations prévues
-
-- Ajouter des tests automatisés
-- Contrôler la qualité des données
-- Exporter les indicateurs en CSV
-- Automatiser le pipeline de traitement
+- Tests automatisés
+- Analyse SQL
+- Data Warehouse
+- dbt
+- Airflow
+- Visualisation
