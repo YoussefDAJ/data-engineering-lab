@@ -1,198 +1,151 @@
 # Energy Data Engineering Lab
 
-## Objectif
+**Du script Python exploratoire au pipeline modulaire testé — analyse de données énergétiques publiques (2000–2025).**
 
-Construire progressivement une plateforme de traitement
-et d'analyse de données énergétiques publiques.
+## Objectif et question métier
 
-## Premier cas métier
+Ce projet personnel documente la construction progressive d'un pipeline de traitement de données énergétiques avec Python. Il illustre également le passage d'un script séquentiel à une architecture modulaire, afin d'améliorer la lisibilité, la réutilisation et la testabilité du code.
 
-Comment a évolué la part des renouvelables
-dans la production d'électricité en France
-et en Allemagne entre 2000 et 2025 ?
-
-## Source
-
-Our World in Data - Energy Dataset
-Version : 2026-09-10
-
-https://catalog.ourworldindata.org/energy/owid_energy/
-
-Les données sont compilées à partir de plusieurs producteurs,
-notamment Ember et Energy Institute. Consulter les conditions
-de réutilisation et les références sur le site source.
-
-Licence des données électriques Ember :
-Creative Commons Attribution 4.0 (CC BY 4.0).
-
-### Méthodologie
-
-1. Extraction des données énergétiques OWID.
-2. Sélection de la France et de l'Allemagne.
-3. Filtrage de la période 2000-2025.
-4. Traitement des valeurs manquantes.
-5. Vérification des doublons et pourcentages.
-6. Calcul de l'évolution en points de pourcentage.
-7. Export CSV et visualisation.
-
-## Technologies
-
-- Python
-- pandas
-- Git et GitHub
-- pytest (prochain module)
-
-## Installation
-
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements.txt
-
-## Données
-
-Télécharger le CSV officiel dans data/raw/owid_energy.csv
-depuis l'URL de la version 2026-09-10 indiquée ci-dessus.
-
-## Exécution
-
-python src/energy_pipeline.py
+**Question métier :** comment la part des énergies renouvelables dans la **production d'électricité** a-t-elle évolué en France et en Allemagne entre 2000 et 2025 ?
 
 ## Résultats de l'analyse
 
-### Visualisation
+### Évolution de la part des renouvelables
 
-![Évolution des renouvelables en France et Allemagne](reports/figures/evolution_renouvelables.png)
+![Évolution de la part renouvelable dans la production électrique en France et en Allemagne](reports/figures/evolution_renouvelables.png)
 
-### Données et indicateurs
+_Indicateur : part des énergies renouvelables dans la production totale d'électricité (%). Source : Our World in Data, Energy Dataset, version du 10 septembre 2026._
 
-- [Données transformées](data/processed/renewables_fr_de.csv)
-- [Tableau des KPI](reports/kpi_summary.csv)
+| Indicateur                                  |  France | Allemagne |
+| ------------------------------------------- | ------: | --------: |
+| Part renouvelable en 2000                   | 12,74 % |    6,22 % |
+| Part renouvelable en 2025                   | 26,06 % |   59,09 % |
+| Évolution 2000–2025 (points de pourcentage) |  +13,33 |    +52,87 |
 
-### Principaux résultats (2000–2025)
+### Trois enseignements
 
-L'analyse porte sur la part des énergies renouvelables
-dans la production totale d'électricité en France et
-en Allemagne.
+1. **Progression dans les deux pays :** la part renouvelable augmente entre 2000 et 2025.
+2. **Progression plus forte en Allemagne :** +52,87 points contre +13,33 points en France.
+3. **Inversion de l'écart :** en 2000, la France dépasse l'Allemagne de **6,51 points** ; en 2025, l'Allemagne dépasse la France de **33,03 points**.
 
-| Indicateur                |  France | Allemagne |
-| ------------------------- | ------: | --------: |
-| Part renouvelable en 2000 | 12,74 % |    6,22 % |
-| Part renouvelable en 2025 | 26,06 % |   59,09 % |
-| Évolution (points de %)   |  +13,33 |    +52,87 |
+Les écarts sont calculés à partir des valeurs non arrondies, puis arrondis à deux décimales.
 
-### Interprétation
+**Limites :** cet indicateur concerne la production électrique, pas l'énergie totale ni la consommation électrique. Il ne suffit pas pour comparer l'intensité carbone des mix électriques (notamment en raison du nucléaire), et cette analyse descriptive n'identifie pas les causes de ces évolutions.
 
-**1. Une progression dans les deux pays**
+**Consulter les livrables :** [données transformées](data/processed/renewables_fr_de.csv) · [tableau des KPI](reports/kpi_summary.csv) · [graphique](reports/figures/evolution_renouvelables.png)
 
-Entre 2000 et 2025, la part de l'électricité produite
-à partir de sources renouvelables augmente en France
-et en Allemagne.
+## Pipeline et qualité des données
 
-**2. Une progression plus marquée en Allemagne**
+Le traitement suit cinq étapes :
 
-L'Allemagne passe de 6,22 % à 59,09 %, soit
-une augmentation de 52,87 points de pourcentage.
+1. Charger le CSV public d'Our World in Data (OWID).
+2. Sélectionner **France** et **Germany**, puis les années **2000–2025**.
+3. Écarter les observations sans valeur pour `renewables_electricity_share_pct`.
+4. Vérifier la présence des pays, l'absence de doublons pays–année et les parts comprises entre 0 et 100 %.
+5. Exporter **52 observations** (26 années × 2 pays), calculer les KPI et produire un graphique.
 
-La France passe de 12,74 % à 26,06 %, soit
-une augmentation de 13,33 points.
+La qualité des données est contrôlée sur les observations retenues, sans prétendre évaluer l'ensemble du jeu OWID.
 
-**3. Un écart qui s'inverse**
+## Évolution du code : deux versions du même pipeline
 
-En 2000, la France présente une part renouvelable
-supérieure de 6,51 points à celle de l'Allemagne.
+| Critère             | V1 — Script séquentiel                         | V2 — Pipeline modulaire                                        |
+| ------------------- | ---------------------------------------------- | -------------------------------------------------------------- |
+| Fichier             | [`energy_pipeline.py`](src/energy_pipeline.py) | [`energy_pipeline_modular.py`](src/energy_pipeline_modular.py) |
+| Organisation        | Étapes exécutées dans un même script           | Fonctions séparées et `main()`                                 |
+| Réutilisation       | Logique moins facilement isolable              | Transformations importables                                    |
+| Gestion des erreurs | Contrôles dans le flux du script               | Exceptions dans les fonctions de validation                    |
+| Typage              | Pas d'annotations explicites                   | Annotations `Path`, `pd.DataFrame`, `None`                     |
+| Vérification        | Exécution du pipeline                          | Tests unitaires avec `pytest`                                  |
+| Livrable            | CSV transformé                                 | Même CSV transformé                                            |
 
-En 2025, la part allemande dépasse celle de
-la France de 33,02 points.
+### Fonctions de la version modulaire
 
-### Limites de l'analyse
+- `charger_donnees(chemin)` : lit les colonnes utiles du CSV.
+- `nettoyer_donnees(df)` : applique les filtres et valide les observations.
+- `exporter_donnees(df, chemin)` : écrit un fichier CSV.
+- `main()` : orchestre les étapes du pipeline.
 
-- L'indicateur mesure une part de production électrique,
-  et non la part des renouvelables dans l'énergie totale.
-- Les variations annuelles peuvent notamment dépendre
-  des conditions météorologiques et de la production
-  hydroélectrique, éolienne ou solaire.
-- La part renouvelable ne suffit pas à mesurer
-  l'intensité carbone de l'électricité.
-- Cette analyse descriptive ne permet pas d'établir
-  les causes des différences entre les deux pays.
+Les [tests du pipeline modulaire](tests/test_energy_pipeline_modular.py) couvrent six scénarios : filtrage et valeurs manquantes, doublons, pourcentages invalides, export CSV, pays absent et colonne absente.
 
-## Evolution du projet : du script simple au pipeline modulaire
+**Enseignement :** le principal gain n'est pas la vitesse d'exécution, mais la facilité de maintenance, de réutilisation et de test.
 
-### Version 1 — Pipeline initial
+## Reproduire le projet
 
-Fichier : `src/energy_pipeline.py`
+Instructions pour **macOS / Linux**, à partir d'un terminal et d'une installation Python 3 compatible avec les dépendances du projet.
 
-Cette première version repose sur un script Python
-séquentiel regroupant les étapes suivantes :
+### 1. Cloner le dépôt et installer les dépendances
 
-- Lecture des données CSV
-- Filtrage des observations
-- Nettoyage et contrôles qualité
-- Export des résultats
+```bash
+git clone https://github.com/YoussefDAJ/data-engineering-lab.git
+cd data-engineering-lab
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+```
 
-Cette approche permet de construire rapidement
-un premier pipeline fonctionnel.
+### 2. Télécharger la version figée des données OWID
 
-### Version 2 — Pipeline modulaire
+```bash
+mkdir -p data/raw
+curl -L --fail --retry 3 \
+  "https://catalog.ourworldindata.org/garden/energy/2026-09-10/owid_energy/owid_energy.csv" \
+  -o data/raw/owid_energy.csv
+```
 
-Fichier : `src/energy_pipeline_modular.py`
+Le CSV original n'est pas stocké dans le dépôt ; le téléchargement ci-dessus récupère la **version du 10 septembre 2026**, afin d'éviter que des mises à jour ultérieures du catalogue modifient les résultats de cette analyse.
 
-Le pipeline a été refactorisé en plusieurs fonctions :
+### 3. Exécuter les deux versions et comparer leurs sorties
 
-- `charger_donnees()` : ingestion
-- `nettoyer_donnees()` : transformation et validation
-- `exporter_donnees()` : stockage
-- `main()` : orchestration
-
-### Pourquoi cette évolution ?
-
-| Critère         | Version 1                       | Version 2                |
-| --------------- | ------------------------------- | ------------------------ |
-| Architecture    | Script séquentiel               | Fonctions indépendantes  |
-| Réutilisation   | Limitée                         | Fonctions réutilisables  |
-| Tests unitaires | Difficiles à isoler             | Tests avec pytest        |
-| Maintenance     | Modifications dans un seul bloc | Responsabilités séparées |
-| Typage          | Non explicité                   | Annotations de types     |
-| Résultats       | CSV                             | CSV identique            |
-
-### Validation
-
-Les deux versions produisent le même fichier
-de données transformées.
-
-La version modulaire est accompagnée de tests
-automatisés permettant de vérifier notamment :
-
-- Le filtrage des pays
-- Le traitement des valeurs manquantes
-- Le rejet des doublons
-- Le contrôle des pourcentages
-- L'export des résultats
-
-### Exécution
-
-Version initiale :
-
-```bash id="lgh4t7"
+```bash
 python src/energy_pipeline.py
-```
+cp data/processed/renewables_fr_de.csv /tmp/renewables_v1.csv
 
-Version modulaire :
-
-```bash id="w8ufd9"
 python src/energy_pipeline_modular.py
+diff -u /tmp/renewables_v1.csv data/processed/renewables_fr_de.csv
 ```
 
-Exécution des tests :
+Si `diff` ne produit aucune ligne, les deux fichiers CSV sont identiques. Les programmes utilisent le même nom de fichier de sortie : les lancer successivement écrase donc le même CSV.
 
-```bash id="wa6bpa"
+### 4. Exécuter les tests et produire les résultats
+
+```bash
 python -m pytest -v
+python src/create_report.py
 ```
 
-### Enseignement principal
+Les livrables générés sont `data/processed/renewables_fr_de.csv`, `reports/kpi_summary.csv` et `reports/figures/evolution_renouvelables.png`.
 
-Un pipeline de données ne doit pas seulement
-produire des résultats corrects.
+## Technologies et structure
 
-Il doit également être compréhensible,
-réutilisable, maintenable et testable.
+**Python · pandas · Matplotlib · pytest · Git/GitHub**
+
+```text
+data-engineering-lab/
+├── data/
+│   ├── raw/                  # CSV OWID téléchargé, non versionné
+│   └── processed/            # CSV nettoyé publié
+├── src/
+│   ├── energy_pipeline.py
+│   ├── energy_pipeline_modular.py
+│   └── create_report.py
+├── tests/
+│   └── test_energy_pipeline_modular.py
+├── reports/
+│   ├── figures/
+│   │   └── evolution_renouvelables.png
+│   └── kpi_summary.csv
+├── requirements.txt
+└── README.md
+```
+
+## Sources, attribution et licences
+
+- **Our World in Data (OWID)** — [Energy Dataset et documentation](https://catalog.ourworldindata.org/energy/owid_energy/), version utilisée : **2026-09-10**. Le jeu de données regroupe et harmonise plusieurs sources.
+- **Ember** — [Yearly Electricity Data](https://ember-energy.org/data/yearly-electricity-data/). Ses données électriques sont proposées sous licence [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+- **Energy Institute** — [Statistical Review of World Energy](https://www.energyinst.org/statistical-review/), autre producteur cité dans le jeu énergétique OWID.
+
+**Attribution :** analyse, transformation et visualisation personnelles à partir du jeu énergétique d'Our World in Data et de ses producteurs d'origine. Les licences des données tierces peuvent différer : consulter les références et conditions indiquées pour chaque variable dans le catalogue OWID. La mention CC BY 4.0 concerne les données électriques d'Ember ; elle ne doit pas être étendue automatiquement à tout le jeu OWID.
+
+## Prochaines étapes
+
+Ajouter de la journalisation (`logging`), améliorer les tests et l'automatisation, puis approfondir SQL, la modélisation analytique et l'orchestration de pipelines.
