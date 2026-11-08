@@ -115,3 +115,84 @@ la France de 33,02 points.
   l'intensité carbone de l'électricité.
 - Cette analyse descriptive ne permet pas d'établir
   les causes des différences entre les deux pays.
+
+## Evolution du projet : du script simple au pipeline modulaire
+
+### Version 1 — Pipeline initial
+
+Fichier : `src/energy_pipeline.py`
+
+Cette première version repose sur un script Python
+séquentiel regroupant les étapes suivantes :
+
+- Lecture des données CSV
+- Filtrage des observations
+- Nettoyage et contrôles qualité
+- Export des résultats
+
+Cette approche permet de construire rapidement
+un premier pipeline fonctionnel.
+
+### Version 2 — Pipeline modulaire
+
+Fichier : `src/energy_pipeline_modular.py`
+
+Le pipeline a été refactorisé en plusieurs fonctions :
+
+- `charger_donnees()` : ingestion
+- `nettoyer_donnees()` : transformation et validation
+- `exporter_donnees()` : stockage
+- `main()` : orchestration
+
+### Pourquoi cette évolution ?
+
+| Critère         | Version 1                       | Version 2                |
+| --------------- | ------------------------------- | ------------------------ |
+| Architecture    | Script séquentiel               | Fonctions indépendantes  |
+| Réutilisation   | Limitée                         | Fonctions réutilisables  |
+| Tests unitaires | Difficiles à isoler             | Tests avec pytest        |
+| Maintenance     | Modifications dans un seul bloc | Responsabilités séparées |
+| Typage          | Non explicité                   | Annotations de types     |
+| Résultats       | CSV                             | CSV identique            |
+
+### Validation
+
+Les deux versions produisent le même fichier
+de données transformées.
+
+La version modulaire est accompagnée de tests
+automatisés permettant de vérifier notamment :
+
+- Le filtrage des pays
+- Le traitement des valeurs manquantes
+- Le rejet des doublons
+- Le contrôle des pourcentages
+- L'export des résultats
+
+### Exécution
+
+Version initiale :
+
+```bash id="lgh4t7"
+python src/energy_pipeline.py
+```
+
+Version modulaire :
+
+```bash id="w8ufd9"
+python src/energy_pipeline_modular.py
+```
+
+Exécution des tests :
+
+```bash id="wa6bpa"
+python -m pytest -v
+```
+
+### Enseignement principal
+
+Un pipeline de données ne doit pas seulement
+produire des résultats corrects.
+
+Il doit également être compréhensible,
+réutilisable, maintenable et testable.
