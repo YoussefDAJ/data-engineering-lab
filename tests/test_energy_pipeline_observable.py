@@ -107,7 +107,7 @@ def test_warning_valeurs_manquantes(tmp_path, caplog):
 
     # Vérifier la présence du WARNING
     assert "Valeurs manquantes détectées" in caplog.text
-    assert "1 lignes" in caplog.text
+    assert "nombre=1" in caplog.text
 
     # Le pipeline continue normalement
     assert n == 2

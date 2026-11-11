@@ -48,7 +48,7 @@ def executer_pipeline(source: Path, sortie: Path) -> int:
 
         if nombre_manquants > 0:
             LOGGER.warning(
-                "Valeurs manquantes détectées | %d lignes | "
+                "Valeurs manquantes détectées | nombre=%d | "
                 "périmètre=France/Allemagne 2000-2025",
                 nombre_manquants,
             )
